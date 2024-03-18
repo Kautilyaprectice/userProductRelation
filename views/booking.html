@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body style="margin: 0">
+    <form onsubmit="handleFormSubmit(event)">
+        <label for="username">Username</label>
+        <input type="text" name="username" id="username" />
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email" />
+        <label for="phone">Phone No</label>
+        <input type="tel" name="phone" id="phone" />
+        <button type="submit">Submit</button>
+    </form>
+    <ul id="userList"></ul>    
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.8/axios.min.js"></script>
+<script>
+  function handleFormSubmit(event) {
+
+    const name = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const number = document.getElementById('number').value;
+
+    const userDetails = {
+        name: name,
+        email: email,
+        number:number
+    }
+    axios.post('http://localhost:3000/admin/user/add-user', userDetails)
+      .then((response) => {
+          console.log(response)
+      })
+      .catch((err) => { console.log(err) });
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+    axios.get('http://localhost:3000/admin/user')
+      .then((response) => {
+        console.log(response)
+        for (var i = 0; i < response.data.user.length; i++) {
+          showUser(response.data.user[i]);
+        }
+      })
+      .catch((err) => { console.log(err) });
+    })
+    function showUser(user) {
+    document.getElementById('username').value;
+    document.getElementById('email').value;
+    document.getElementById('number').value;
+    const parent = document.getElementById('userList');
+    const child = document.createElement('li');
+    child.id = `${user.id}`;
+    child.textContent = `${user.name}-${user.email}-${user.number}`
+    const DelButton = document.createElement('button');
+    DelButton.textContent = 'Delete'
+    DelButton.className = 'delete'
+    //parent.innerHTML = parent.innerHTML + child;
+    parent.appendChild(child);
+    child.appendChild(DelButton);
+
+    DelButton.addEventListener('click', function Deleteuser() {
+      console.log(child.id);
+      axios.delete(`http://localhost:3000/admin/user/delete-user/${child.id}`)
+        .then((response) => {
+          // console.log(userId.config)
+          removeUSerFromScreen(child.id)
+          console.log(response);
+        })
+    })
+    function removeUSerFromScreen(userId) {
+      const parentNode = document.getElementById('listofitems');
+      const childNodeTOBeDeleted = document.getElementById(userId);
+      if (childNodeTOBeDeleted) {
+          parentNode.removeChild(childNodeTOBeDeleted);
+      }
+    }
+  }
+</script>
+</html>
